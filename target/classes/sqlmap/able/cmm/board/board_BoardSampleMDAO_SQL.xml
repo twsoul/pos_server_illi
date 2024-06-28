@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    SQL File Name : board_BoardSampleMDAO_sql.xml 
+    Description : Board Sample 데이터를 관리한다.(등록, 수정, 삭제 및 조회)
+
+    Modification Information 
+               수정일                 수정자         Version      Query Id
+    ==========  =======  ========   ==============
+    2016.03.04    고명진            1.0          최초 생성 
+-->
+<mapper namespace="able.board.service.dao.BoardSampleMDAO">
+
+	<resultMap type="able.board.vo.BoardSampleVO" id="boardSampleVO" >
+		<result property="artId" column="art_id"/>
+		<result property="artCategory" column="art_category"/>
+		<result property="artSubject" column="art_subject"/>
+		<result property="artContent" column="art_content"/>
+		<result property="regUser" column="reg_user"/>
+		<result property="regDate" column="reg_date"/>
+	</resultMap>
+	
+	<resultMap type="able.board.vo.BoardSampleFileVO" id="fileVOResult" >
+		<result property="fileId" column="FILE_ID"/>
+		<result property="originalFileName" column="ORG_FILE_NAME"/>
+		<result property="storedFileName" column="STO_FILE_NAME"/>
+		<result property="fileSize" column="FILE_SIZE"/>
+		<result property="folderPath" column="FOLDER_PATH"/>
+		<result property="regDate" column="REG_DATE"/>
+	</resultMap>
+	
+ 	<!-- 
+        Query ID : insertSample
+        Description : 게시글을 등록한다.
+     -->
+	<insert id="insertSample" parameterType="able.board.vo.BoardSampleVO">
+    <![CDATA[
+		INSERT /* Query ID=able.board.service.dao.BoardSampleMDAO.insertSample */ 
+		INTO BOARD_ARTICLE
+		( 
+			ART_ID
+		  , ART_CATEGORY
+		  , ART_SUBJECT
+		  , ART_CONTENT
+		  , REG_USER
+		  , REG_DATE
+		)
+		VALUES ( 
+			#{artId}
+	      , #{artCategory}
+		  , #{artSubject}
+		  , #{artContent}
+		  , #{regUser}
+		  , SYSDATE
+		)
+    ]]>  
+	</insert>
+	
+	<select id="selectMaxArticleId" resultType="String">
+		SELECT 
+			NVL(MAX(ART_ID)+1, 1) as ART_ID
+		FROM 
+			BOARD_ARTICLE
+	</select>
+	
+	<select id="selectMaxCommentId" resultType="String">
+		SELECT 
+			NVL(MAX(CMT_ID)+1, 1) as CMT_ID
+		FROM 
+			BOARD_COMMENT
+	</select>
+	
+	<insert id="insertFile" parameterType="able.board.vo.BoardSampleFileVO">
+        INSERT 
+          INTO BOARD_FILE(
+          	   ART_ID,
+               FILE_ID,
+               ORG_FILE_NAME,
+               STO_FILE_NAME,
+               FILE_SIZE,
+               FOLDER_PATH,
+               REG_DATE
+               )
+        VALUES
+        (
+        	#{artId}
+       	  ,	#{fileId}
+	      , #{originalFileName}
+	      , #{storedFileName}
+	      , #{fileSize}
+	      , #{folderPath}
+	      , #{regDate}
+        )
+    </insert>
+    
+    <select id="selectSample" resultMap="boardSampleVO">
+	<![CDATA[
+		SELECT 
+			ART_ID
+			, ART_CATEGORY
+			, ART_SUBJECT
+			, ART_CONTENT
+			, REG_USER
+			, REG_DATE
+		FROM BOARD_ARTICLE
+		WHERE ART_ID = #{id}
+	]]> 			
+	</select>
+
+	<select id="selectSampleList" parameterType="able.board.vo.BoardSampleVO" resultType="hMap">
+	<![CDATA[
+		SELECT DISTINCT
+			a.ART_ID
+			  , a.ART_CATEGORY
+			  , a.ART_SUBJECT
+			  , a.ART_CONTENT
+			  , a.REG_USER
+			  , TO_CHAR(a.REG_DATE,'YYYY-MM-DD') AS a.REG_DATE
+			  , CASE 
+			  		WHEN b.FILE_ID IS NOT NULL THEN 'Y'
+			  	    ELSE 'N' END AS ATTACH_YN
+		FROM BOARD_ARTICLE a
+		LEFT OUTER JOIN BOARD_FILE b
+		ON a.ART_ID = b.ART_ID
+		WHERE 1=1
+	]]> 
+		<if test="searchKeyword != null and searchKeyword != ''">
+	        <choose>
+	            <when test="searchCondition == 0">
+					AND	ART_CATEGORY LIKE '%' || #{searchKeyword} || '%'
+				</when>
+	            <when test="searchCondition == 1">
+					AND	ART_SUBJECT LIKE '%' || #{searchKeyword} || '%'
+				</when>
+				<when test="searchCondition == 2">
+					AND	REG_USER LIKE '%' || #{searchKeyword} || '%'
+				</when>
+			</choose>
+		</if>
+		ORDER BY ART_ID DESC
+		LIMIT #{limit} OFFSET #{offset}
+	</select>
+	
+	<select id="selectSampleListCount" parameterType="able.board.vo.BoardSampleVO" resultType="Integer">
+	<![CDATA[
+		SELECT 
+			COUNT(DISTINCT a.ART_ID)
+		FROM BOARD_ARTICLE a
+		LEFT OUTER JOIN BOARD_FILE b
+		ON a.ART_ID = b.ART_ID
+		WHERE 1=1
+	]]> 
+	</select>
+	
+	<select id="selectFileVOByKey" parameterType="String" resultMap="fileVOResult">
+        SELECT 
+        	FILE_ID
+        	, ORG_FILE_NAME
+        	, STO_FILE_NAME
+        	, FILE_SIZE
+        	, FOLDER_PATH
+        	, REG_DATE
+          FROM BOARD_FILE
+         WHERE FILE_ID = #{fileId}
+    </select>
+	
+	<select id="selectFileVOList" parameterType="String" resultMap="fileVOResult">
+		SELECT 
+			FILE_ID
+			, ORG_FILE_NAME
+			, STO_FILE_NAME
+			, FILE_SIZE
+			, FOLDER_PATH
+			, REG_DATE
+		FROM BOARD_FILE
+		WHERE ART_ID = #{artId}
+	</select>
+	
+	<delete id="deleteFileVOByKey" parameterType="String">
+        DELETE FROM BOARD_FILE
+        WHERE FILE_ID = #{fileId}
+    </delete>
+    
+    <delete id="deleteSample" parameterType="String">
+        DELETE FROM BOARD_ARTICLE
+        WHERE ART_ID = #{artId}
+    </delete>
+	
+	<update id="updateSample" parameterType="able.board.vo.BoardSampleVO">
+	<![CDATA[
+		UPDATE  
+			BOARD_ARTICLE
+		SET 
+			  ART_CATEGORY = #{artCategory}
+			, ART_SUBJECT = #{artSubject}
+			, ART_CONTENT = #{artContent}
+	  	WHERE ART_ID = #{artId}
+	]]> 
+	</update>
+	
+</mapper>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+    	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+    	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd">
+   
+    <bean id="logAopXML" class="able.cmm.aopxml.xml.AopSampleXML" />
+    
+    <!-- AOP_XML 설정 -->
+	<aop:config>
+		<aop:aspect ref="logAopXML">
+			<aop:pointcut id="getMethods"
+				expression="execution(* able.cmm.aopxml.service..*Impl.get*(..))" />
+				
+			<aop:pointcut id="updateMethods"
+				expression="execution(* able.cmm.aopxml.service..*Impl.update*(..))" />
+				
+			<aop:before method="beforeExecuteGetMethod"
+				pointcut-ref="getMethods" />
+				
+			<aop:after-returning method="afterReturningExecuteGetMethod"
+				returning="retVal" pointcut-ref="getMethods" />
+				
+			<aop:after method="afterExecuteGetMethod"
+				pointcut-ref="getMethods" />
+	   </aop:aspect>
+	</aop:config>  
+	
+	
+    <!-- AOP_Annotaiton 설정  -->
+    
+    <aop:aspectj-autoproxy/>    
+    <bean id="logAop" class="able.cmm.aop.annotation.AopSampleAnnotation" />
+	
+</beans>

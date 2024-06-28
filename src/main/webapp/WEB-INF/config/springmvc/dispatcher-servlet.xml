@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:p="http://www.springframework.org/schema/p"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:mvc="http://www.springframework.org/schema/mvc"
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+                http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd">
+
+<!--  @Controller 컴포넌트 스캔 시작 -->
+    <context:component-scan base-package="able.**.web">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+    </context:component-scan>
+<!--  @Controller 컴포넌트 스캔 끝 -->
+
+<!--     <beans:bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <beans:property name="properties" ref="tmsConfig"/>
+    </beans:bean>
+    
+    <beans:bean id="tmsConfig" class="org.springmodules.commons.configuration.CommonsConfigurationFactoryBean">
+        <beans:property name="configurations">
+            <beans:list>
+                <beans:ref bean="tmsXmlConfiguration"/>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="tmsXmlConfiguration" class="org.apache.commons.configuration.XMLConfiguration">
+        <beans:constructor-arg type="java.lang.String">
+            <beans:value>config/EAI.xml</beans:value>
+        </beans:constructor-arg>
+    </beans:bean> -->
+
+<!-- LocaleResolver 선언 시작 -->
+    <!-- 세션을 이용한 Locale 정보 사용  -->
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver" />
+<!-- LocaleResolver 선언 끝 -->
+
+<!-- Interceptor 선언 시작  -->
+    <!-- LocaleChangeInterceptor의 확장.
+     localeParamName에 설정된 값으로 언어 변경 가능 -->
+    <bean id="commonInterceptor" class="able.com.web.interceptor.CommonInterceptor">
+        <property name="localeParamName" value="ABLE_LANGUAGE_SELECTION_PARAM" />
+    </bean>
+    
+        <!-- Enables the Spring MVC @Controller programming model -->
+    <mvc:annotation-driven>
+        <mvc:argument-resolvers>
+            <beans:bean class="able.common.utility.CustomMapArgumentResolver" />
+        </mvc:argument-resolvers>
+    </mvc:annotation-driven>
+    
+    <mvc:default-servlet-handler/>
+
+    
+    <!-- 웹보안 인터셉터 -->
+    <bean id = "webSecurityInterceptor" class="able.com.web.interceptor.WebSecurityInterceptor" />
+<!-- Interceptor 선언 끝 -->
+
+
+<!-- HandlerMappings 선언 시작 -->
+    <!--
+        interceptor 설정에는 2가지 방법 중 한가지 적용
+            1) <mvc:interceptors> 사용
+            2)ExtendedUriRequestMappingHandler
+     -->
+
+    <!-- 1)<mvc:interceptors> 설정 시작- -> 
+        <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" />
+        <mvc:interceptors>
+            <!- - 전체 적용되는 인터셉터 - ->
+            <ref bean="commonInterceptor"/>
+            <ref bean="webSecurityInterceptor"/>
+            
+            <!- - 부분 적용되는 인터셉터 - ->
+            <mvc:interceptor>
+                <!- - 적용할 url 패턴 - ->
+                <mvc:mapping path="/**/*.do" />
+                <!- - 제외할 url 패턴  - ->
+                <mvc:exclude-mapping path="/**/login.do"/>
+                <mvc:exclude-mapping path="/**/logout.do"/>
+                <mvc:exclude-mapping path="/common/*.do"/>
+                <mvc:exclude-mapping path="/cmm/**/*.do"/>
+                <mvc:exclude-mapping path="/redirectLogin.do"/>
+                <!- -  Test용 제외할 url 패턴 - ->
+                <mvc:exclude-mapping path="/test/**/*.do"/>
+                <ref bean="sessionInterceptor" />
+            </mvc:interceptor>
+        </mvc:interceptors>
+    <!- - 1)<mvc:interceptors> 설정 끝  -->
+
+    <!-- 2) ExtendedUriRequestMappingHandler 설정 시작 -->
+        <!-- Session 검사를 하는 URL처리를 위한 HandlerMapping -->
+        <bean id="sessionAnnotationMapper" class="able.com.web.servlet.ExtendedUriRequestMappingHandler" p:order="1">
+            <property name="interceptors">
+                <list>
+                    <ref bean="webSecurityInterceptor" />
+                </list>
+            </property>
+            <!--
+                [filterType]
+                includePattern에 해당하고,  excludeUrlPattern에 해당하지 않는 uri 처리 : 1 (defalut)
+                excludeUrlPattern에 해당하지 않거나, includePattern에 해당하는 uri처리 : 2
+            -->
+            <property name="filterType" value="1"/>
+            <!-- interceptor를 적용할  url pattern 목록-->
+            <property name="includeUrlPattern">
+                <list>
+                    <value>/**/*.do</value>
+                </list>
+            </property>
+            <!-- interceptor를 적용하지 않을  url pattern 목록-->
+            <property name="excludeUrlPattern">
+                <list>
+                    <value>/**/login.do</value>
+                    <value>/**/logout.do</value>
+                    <value>/common/*.do</value>
+                    <value>/cmm/**/*.do</value>
+                    <value>/redirectLogin.do</value>
+                    <!-- Test를 위한 경로 정의 -->
+                    <value>/test/**/*.do</value>
+                </list>
+            </property>        
+        </bean>
+        
+        <!-- Session 검사를 하지 않는 URL처리를 위한 HandlerMapping -->
+        <bean id="annotationMapper" class="able.com.web.servlet.ExtendedUriRequestMappingHandler" p:order="2">
+            <property name="interceptors">
+                <list>
+                    <ref bean="commonInterceptor" />
+                </list>
+            </property>
+            <property name="filterType" value="1"/>
+            <!-- interceptor를 적용할  url pattern 목록-->
+            <property name="includeUrlPattern">
+                <list>
+                    <value>/**/login.do</value>
+                    <value>/**/logout.do</value>
+                    <value>/common/*.do</value>
+                    <value>/cmm/**/*.do</value>
+                    <value>/redirectLogin.do</value>
+                    <!-- Test를 위한 경로 정의 -->
+                    <value>/test/**/*.do</value>
+                </list>
+            </property>
+            <!-- interceptor를 적용하지 않을  url pattern 목록 -->
+            <property name="excludeUrlPattern">
+                <list></list>
+            </property>          
+         </bean>
+    <!-- 2) ExtendedUriRequestMappingHandler 설정  끝 -->
+
+<!-- HandlerMappings 선언 끝  -->
+
+<!-- HandlerAdapters 선언 시작 -->
+    <!--
+        URI 와 매핑되는 Contorller 의 메소드를 실행시,
+        파라미터로 존재하는 타입에 대한 ArgumentResolver를 실행하여 가져온다.
+     -->
+    <bean class="able.com.web.servlet.HRequestMappingHandlerAdapter">
+        <!--
+            - ArgumentResolver 처리 우선권은 3가지로 설정할수 있다.
+            1. AbleCustomArgumentResolvers
+            2. ArgumentResolvers (Spring)
+            3. CustomArgumentResolvers 
+         -->
+        <property name="ableCustomArgumentResolvers">
+            <list>
+                <!-- HMap을 위한 Argument Resolver -->
+                <bean class="able.com.web.context.HMapHandlerMethodArgumentResolver" />
+            </list>
+        </property>
+        
+         <!-- message Converter -->
+        <property name="messageConverters">
+            <ref bean="jsonMessageConverter"/>
+        </property>
+        
+        <!-- 타입 변환을 위한 설정
+            - 처리 우선순위
+            1. Custom PropertyEditor
+            2. Conversion Service (Converter)
+            3. Default PropertyEditor
+        -->
+        <property name="webBindingInitializer">
+            <bean class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer">
+                <property name="conversionService" ref="conversionService" />
+                <property name="validator" ref="validator" />
+                <!-- 추가할 Custom PropertyEditor 
+                <property name="propertyEditorRegistrar"/> -->
+            </bean>
+        </property>
+        <!-- true로 설정 시 Session 별로 직렬로 동작 -->
+        <property name="synchronizeOnSession" value="false" />
+    </bean>
+
+    <!-- Type Conversion 서비스 (Spring 3) -->
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+          <!-- 추가할 Custom Conversion Service/Formatter -->
+          <!--
+          <property name="converters"></property>
+          <property name="formatters"></property>
+           -->
+    </bean>
+
+    <!-- Validation 사용을 위한 Hibernate validator-->
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <property name="validationMessageSource" ref="messageSource" />
+    </bean>
+<!-- HandlerAdapter 선언 끝 -->
+
+<!-- HandlerExceptionResolvers 선언 시작 -->
+    <!--
+        - ServletContext 상의 Exception 발생에 따른 처리를 담당
+        - 각 Exception 타입별 View설정
+    -->
+    <bean class="able.com.exception.resolver.MappingExceptionResolver">
+        <property name="interceptor" value="able.com.exception.resolver.DefaultExceptionServiceImpl"/>
+        
+        <property name="defaultErrorView" value="cmmn/defaultError"/>
+        <property name="exceptionMappings">
+            <props>
+                <prop key="org.springframework.dao.DataAccessException">cmmn/defaultError</prop>
+                <prop key="org.springframework.transaction.TransactionException">cmmn/defaultError</prop>
+                <prop key="able.com.exception.BizException">able/exception/error</prop>
+                <prop key="org.springframework.security.AccessDeniedException">cmmn/defaultError</prop>
+            </props>
+        </property>
+    </bean>
+<!-- HandlerExceptionResolvers 선언 끝 -->
+ 
+<!-- ViewResolver 선언 시작 -->
+    <!-- View를 선택하는 ViewResolver 설정 -->
+    <!-- JSTL(JSP) View 설정
+        - Controller에서 "vets" 라는 view 이름을 리턴할 경우,
+        - prefix와 suffix를 합하여 적절한 view를 찾는다.
+        - 예) prefix(/WEB-INF/jsp/) + "vets" + suffix(.jsp) = "/WEB-INF/jsp/vets.jsp"
+    -->
+    <bean id="urlBasedView" class="org.springframework.web.servlet.view.UrlBasedViewResolver" p:order="1"
+        p:viewClass="org.springframework.web.servlet.view.JstlView"
+        p:prefix="/WEB-INF/jsp/" p:suffix=".jsp"/>
+
+    <!-- Controller에서 처리 로직이 없이 바로 view로 이동하는 경우에 사용하는 Controller
+       DispatcherServlet을 거쳐야 하지만, html 위주의 static한 페이지를 보여줄때 사용
+       URL path가 곧 뷰이름이 되며, prefix와 suffix를 지정할수도 있다.
+     -->
+    <bean id="urlFilenameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
+    
+    <!--  jsonView (jackson) 설정.
+        - jackson을 이용한 object,json 간의 mapper 사용 view 
+     -->
+    <bean id="jsonMapper" class="com.fasterxml.jackson.databind.ObjectMapper"/>
+    <bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
+    <!-- <bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView"> -->
+        <property name="objectMapper" ref="jsonMapper" />
+    </bean>
+    
+    <bean id="jsonMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="supportedMediaTypes">
+            <list>
+                <value>application/json;charset=UTF-8</value>
+            </list>
+        </property>
+    </bean>
+    
+    <!-- BeanNameViewResolver
+        - view 이름과 bean 이름(name,id)가 일치하는 view 사용
+    -->
+    <bean id="beanNameResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver" p:order="0"/>
+<!-- ViewResolver 선언 끝 -->
+    
+</beans>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>TripleDES Test</title>
+</head>
+<body>
+<!-- TripleDES Test 시작 -->
+<script src="/ableWeb/js/jquery/jquery-2.1.4.min.js"></script>
+<script src="/ableWeb/js/ablecrypto/able-tripledes.js"></script>
+	
+<div id="1"></div>
+<div id="2"></div>
+
+<div id="3"></div>
+<div id="4"></div>
+
+<div id="5"></div>
+
+<script>
+var key = AbleCrypto.parseHex('6e7ae0e33251ec91a7fb62c4b97c1a646d70ab016ba846b6');
+var iv  = AbleCrypto.parseHex('0001020304050607');
+var message = "ableframe";
+
+var encrypted = AbleCrypto.TripleDES.encrypt(message, key, { iv: iv });
+//var encrypted = CryptoJS.TripleDES.encrypt(message, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7});
+
+$('#1').text("Encrypted: "+encrypted);
+$('#2').text("Encrypted hex: "+AbleCrypto.parseBase64(encrypted));
+
+var encryptedBase64 = "Cp6qGvtTTbnt3Bc07bAptg==";
+var encryptedHex = "0a9eaa1afb534db9eddc1734edb029b6";
+
+$('#3').text( "Check Base64: " + (encrypted == encryptedBase64 ));
+$('#4').text( "Check Hex: " + (AbleCrypto.parseBase64(encrypted) == encryptedHex ));
+
+
+var decrypted = AbleCrypto.TripleDES.decrypt( encrypted, key, { iv: iv});
+//var decrypted = CryptoJS.TripleDES.decrypt( encrypted, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7});
+$('#5').text( "Decrypted text: " + decrypted);
+</script>
+</body>
+</html>
+

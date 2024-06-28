@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AES256 Test</title>
+</head>
+<body>
+<!-- AES256 Test 시작 -->
+<script src="/ableWeb/js/jquery/jquery-2.1.4.min.js"></script>
+<script src="/ableWeb/js/ablecrypto/able-aes.js"></script>
+
+<div id="1"></div>
+<div id="2"></div>
+
+<div id="3"></div>
+<div id="4"></div>
+
+<div id="5"></div>
+
+<script>
+
+var key = AbleCrypto.parseHex('603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4');
+var iv  = AbleCrypto.parseHex('000102030405060708090A0B0C0D0E0F');
+
+var message = "ableframe";
+
+var encrypted = AbleCrypto.AES.encrypt(message, key, { iv: iv });
+
+$('#1').text("Encrypted: "+encrypted);
+$('#2').text("Encrypted hex: "+AbleCrypto.parseBase64(encrypted));
+
+var encryptedBase64 = "nvtv1CtLNp51m5t1IWQdDA==";
+var encryptedHex = "9efb6fd42b4b369e759b9b7521641d0c";
+
+$('#3').text( "Check Base64: " + (encrypted == encryptedBase64 ));
+$('#4').text( "Check Hex: " + (AbleCrypto.parseBase64(encrypted) == encryptedHex ));
+
+var decrypted = AbleCrypto.AES.decrypt( encrypted, key, { iv: iv});
+//var decrypted = CryptoJS.AES.decrypt( encrypted, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7});
+
+$('#5').text( "Decrypted text: " + decrypted);
+</script>
+</body>
+</html>
+

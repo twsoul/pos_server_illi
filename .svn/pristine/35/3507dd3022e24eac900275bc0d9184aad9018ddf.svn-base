@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
+
+	<bean name="propertiesService" class="able.com.service.prop.PropertyServiceImpl" destroy-method="destroy">  
+		<property name="properties">
+	        <map>
+	        	<entry key="pageUnit" value="20"/>
+	        	<entry key="pageSize" value="10"/>
+	        </map>
+		</property>
+		<!-- 외부파일 로딩 시 아래 참조. 외부파일을 로딩할 경우 서버 재구동 없이 변경사항 적용 가능
+		<property name="extFileName">
+         <set>
+            <map>
+               <entry key="encoding" value="UTF-8"/>
+               <entry key="filename" value="file:C:/eGovFrameDev-3.5.1-32bit/workspace/ableWeb/src/**/refresh-resource.properties"/>
+            </map>
+            <value>classpath*:../properties/resource.properties</value>
+         </set>
+      </property> -->
+       
+	</bean>
+	
+</beans>	

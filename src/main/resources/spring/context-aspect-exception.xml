@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd">
+
+    <!-- 모든 aop 선언적 요소들은 <aop:config /> 요소 안에서 사용  -->
+    <aop:config>
+        <!-- Jointpoint의 묶음으로서 Advice는 pointcut 단위로 적용 -->
+        <aop:pointcut id="serviceMethod"
+            expression="execution(* able..service.impl.*Impl.*(..))" />
+        <aop:pointcut id="coreMethod"
+            expression="execution(* able..service.*Impl.*(..))" />
+        <!-- 하나의 Concern에 대한 모듈화 된 묶음 -->
+        <aop:aspect ref="exceptionTransfer">
+            <!-- 메소드가 예외 발생시 적용될 advice 정의 -->
+            <aop:after-throwing throwing="exception"
+                pointcut-ref="serviceMethod" method="transfer" />
+            <aop:after-throwing throwing="exception"
+                pointcut-ref="coreMethod" method="transfer" />
+        </aop:aspect>
+    </aop:config>
+
+    <!-- AOP 기능을 이용하여 ServiceImpl 클래스에서 Exception이 발생한 경우(after-throwing인 경우)에
+       trace()메소드에서 처리한다. 내부적으로 EgovBizException인지 RuntimeException(ex.DataAccessException)
+        인지 구분하여 throw한다. ExceptionTransfer는 내부적으로 DefaultExceptionHandleManager 클래스에 의해서
+        정의된 패턴에 대해서 Handler에 의해서 동작한다.
+     -->
+    <bean id="exceptionTransfer" class="able.com.exception.aspect.ExceptionTransfer">
+        <property name="exceptionHandlerService">
+            <list>
+                <ref bean="defaultExceptionHandleManager" />
+                <ref bean="otherExceptionHandleManager" />
+            </list>
+        </property>
+    </bean>
+
+    <!-- defaultExceptionHandleManager는 setPatters() , setHandlers() 메소드를 가지고 있어 등록된 pattern
+        정보를 이용하여 Exception 발생 클래스와의 비교하여 ture 인 경우 handlers 에 등록된 handler를 실행한다.
+        패턴 검사시 사용되는 pathMatcher 는 AntPathMatcher 를 이용하고 있다. 
+        특정 pattern 그룹군을 만든후 patterns 에 등록하고 그에 해당하는 후처리 로직을 정의하여 등록할 수 있는 구조이다.
+     -->
+    <bean id="defaultExceptionHandleManager"
+        class="able.com.exception.aspect.DefaultExceptionHandleManager">
+        <property name="reqExpMatcher" ref="antPathMater" />
+        <property name="patterns">
+            <list>
+                <value>**service.*Impl</value>
+            </list>
+        </property>
+        <property name="handlers">
+            <list>
+                <ref bean="ableHandler" />
+            </list>
+        </property>
+    </bean>
+    <bean id="otherExceptionHandleManager"
+        class="able.com.exception.aspect.DefaultExceptionHandleManager">
+        <property name="reqExpMatcher" ref="antPathMater" />
+        <property name="patterns">
+            <list>
+                <value>**service.impl.*</value>
+            </list>
+        </property>
+        <property name="handlers">
+            <list>
+                <ref bean="otherHandler" />
+            </list>
+        </property>
+    </bean>
+
+    <!-- Exception 발생 시의 처리를 담당한다. 현재(2010.09.15)는 log 작성만을 수행한다. -->
+    <bean id="ableHandler" class="able.com.exception.aspect.ExcepHndlr" />
+    <bean id="otherHandler" class="able.com.exception.aspect.OthersExcepHndlr" />
+    
+</beans>

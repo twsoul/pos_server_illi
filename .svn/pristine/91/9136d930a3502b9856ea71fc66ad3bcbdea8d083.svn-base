@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd" version="2.0">
+    
+    <tlib-version>1.2</tlib-version>
+    <uri>http://www.able_function_support.com/function</uri>
+    
+    <!--
+    - 문자열이 지정한 길이를 초과했을때 초과한 만큼의 문자열을 입력받은 String으로 변경
+    - ex> "가나다라마바사"  ＞  "가나다..."
+    -->
+    <function>
+        <name>cutString</name>
+        <function-class>able.com.util.tools.fcc.StringUtil</function-class>
+        <function-signature>
+            java.lang.String cutString(java.lang.String, java.lang.String, int)
+        </function-signature>
+    </function>
+    
+    <!-- 
+    - Html 코드가 들어간 문서를 표시할때 태그에 손상없이 보이기 위한 메서드
+    -->
+    <function>
+        <name>checkHtmlView</name>
+        <function-class>able.com.util.tools.fcc.StringUtil</function-class>
+        <function-signature>
+            java.lang.String checkHtmlView(java.lang.String)
+        </function-signature>
+    </function>
+    
+    <!-- 
+    - 자바스크립트상에서 줄바꿈과 따옴표를 처리하기위한 Method
+    - 따옴표를 Encode된 문자로 바꿔준다. ' ＞ &#39; , " ＞ &quot;
+    -->
+    <function>
+        <name>checkHtmlView2</name>
+        <function-class>able.com.util.tools.fcc.StringUtil</function-class>
+        <function-signature>
+            java.lang.String checkHtmlView2(java.lang.String)
+        </function-signature>
+    </function>
+    
+    <!-- 
+    - Encode된 따옴표코드를 따옴표로 바꿔준다. &#39; ＞'  , &quot; ＞ "
+    -->
+    <function>
+        <name>getHtmlStrCnvr</name>
+        <function-class>able.com.util.tools.fcc.StringUtil</function-class>
+        <function-signature>
+            java.lang.String getHtmlStrCnvr(java.lang.String)
+        </function-signature>
+    </function>
+    
+    <!-- 
+    - Encode된 따옴표코드를 따옴표로 바꿔준다. &#39; ＞'  , &quot; ＞ "
+    -->
+    <function>
+        <name>getHtmlStrCnvr2</name>
+        <function-class>able.com.util.tools.fcc.StringUtil</function-class>
+        <function-signature>
+            java.lang.String getHtmlStrCnvr2(java.lang.String)
+        </function-signature>
+    </function>
+    
+</taglib>

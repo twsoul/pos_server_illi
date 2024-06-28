@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    SQL File Name : trans_TransactionSampleMDAO_sql.xml 
+    Description : trans 데이터를 관리한다.(등록, 수정, 삭제 및 조회)
+
+    Modification Information 
+               수정일                 수정자         Version      Query Id
+    ==========  =======  ========   ==============
+    2016.02.14    전경선            1.0          최초 생성 
+-->
+
+<mapper namespace="able.cmm.trans.service.dao.TransactionSampleMDAO">
+
+    <!-- 
+        Query ID : selectTransactionList
+        Description : trans 테이블의 목록을 조회한다.
+     -->
+    <select id="selectTransactionList" resultType="hMap">
+    <![CDATA[
+        SELECT /* Query ID=able.cmm.trans.service.dao.TransactionSampleMDAO.selectTransactionList */
+               TRANS_ID, TRANS_NAME, TRANS_DESC
+          FROM TRANS
+    ]]>          
+    </select>
+    
+    <!-- 
+        Query ID : insertTransaction
+        Description : trans 테이블의 데이터를 한건 등록한다.
+     -->
+    <insert id="insertTransaction" parameterType="hMap">
+    <![CDATA[
+        INSERT /* Query ID=able.cmm.trans.service.dao.TransactionSampleMDAO.insertTransaction */
+          INTO TRANS(
+               TRANS_ID,
+               TRANS_NAME,
+               TRANS_DESC
+               )
+        VALUES (#{transId}, 
+               #{transName}, 
+               #{transDesc})
+    ]]>
+    </insert>
+    
+</mapper>

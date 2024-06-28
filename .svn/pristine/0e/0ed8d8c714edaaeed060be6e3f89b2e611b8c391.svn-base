@@ -1,0 +1,19 @@
+common.server.info=WAS1
+#DEV
+common.eai.l4 = 10.135.106.184
+common.eai.ap1 = 10.135.106.184
+common.eai.ap2 = 10.135.106.184
+common.eai.port = 6110
+common.eai.qname = http://eaidev.dev.net
+common.eai.qname2 = http://TRANSYS_EAI
+common.eai.id = if_user
+common.eai.pwd = eaiUser1
+#REAL
+#common.eai.l4 = 10.135.100.217
+#common.eai.ap1 = 10.135.106.184
+#common.eai.ap2 = 10.135.106.184
+#common.eai.port = 6001
+#common.eai.qname = http://eaidev.dev.net
+#common.eai.qname2 = http://TRANSYS_EAI
+#common.eai.id = if_user
+#common.eai.pwd = eaiUser1

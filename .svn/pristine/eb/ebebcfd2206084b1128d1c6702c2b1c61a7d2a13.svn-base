@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<!-- License Key Locations -->
+	<msp>
+		<system>
+			<license>
+				<key>WEB-INF/config/license.key</key>
+				<cert>WEB-INF/config/license.cer</cert>
+			</license>
+		</system>
+	</msp>
+    <common>
+    	<server>
+    		<info>WAS1</info>
+    	</server>
+        <api>
+            <upload>
+                <path>D:/Upload/</path> <!-- DEV -->
+               <!--  <path>/hptgcs/File6/</path>   REAL -->
+            </upload>
+            <notification>
+            	<server_url>https://madpdev.powertech.co.kr:450/rcv_register_message.ctl</server_url> <!-- DEV -->
+            	<!-- <server_url>https://madp.powertech.co.kr:450/rcv_register_message.ctl</server_url>   REAL -->
+            </notification>
+        </api>
+        <docviewer>
+        	<!-- TEST SERVER INFO -->
+        	<!-- <ip>http://mviewtest.powertech.co.kr:8080</ip>
+        	<serviceid>bc6903a4f8893546-d54bde20ab2108e0</serviceid> -->
+        	<!-- REAL SERVER INFO -->
+        	<ip>http://mview.powertech.co.kr:8080</ip>
+        	<serviceid>c80d1ed70503e700-61b9e6e6e0dbd302</serviceid>
+        	
+        	<viewerinfo>/api/file/info.json</viewerinfo>
+        	<vieweradd>/api/file/urlUpload.json</vieweradd>
+        </docviewer>
+        <gcs-server>
+        	<file-url>http://10.135.106.40/FileUploader</file-url> <!-- DEV -->
+        	<!-- <file-url>http://10.135.100.40/FileUploader</file-url>   REAL -->
+        </gcs-server>
+        <eai>
+        	<l4>10.135.106.184</l4> <!-- DEV -->
+        	<!-- <l4>10.135.100.217</l4>   REAL --> 
+        	<ap1>10.135.106.184</ap1> <!-- DEV -->
+        	<!-- <ap1>10.135.100.215</ap1>   REAL -->
+        	<ap2>10.135.106.184</ap2> <!-- DEV -->
+        	<!-- <ap2>10.135.100.22</ap2>   REAL -->
+        	<port>6110</port> <!-- DEV -->
+        	<!-- <port>6001</port>   REAL -->
+        	<qname>http://eaidev.dev.net</qname>
+        	<qname2>http://TRANSYS_EAI</qname2>
+        	<id>if_user</id>
+        	<pwd>eaiUser1!</pwd>
+        </eai>  
+        <mam>
+        	<user>ERPPM</user>
+        	<pwd>erp!1234</pwd>
+        	<host>https://mdmg.hyundai.net</host>
+        </mam>       
+    </common>
+	<!-- DataSource Configuration -->
+	<datasource>
+		<type>jndi</type>
+        <!--중요! 연결할 DB 종류를 반드시 맞춰주세요-->
+        <dbtype>oracle</dbtype>
+		<jndiname>
+			<msp>
+				<mobile>able_mobile</mobile>
+				<mobile1>able_mobile_dev</mobile1>
+			</msp>
+		</jndiname>
+		<!-- MyBatis MapperLocation -->
+		<mybatis>
+			<msp>
+				<mobile>
+					<!-- <mapperLocation>classpath:kr/msp/sqlmap/${datasource.dbtype}/**/*.xml</mapperLocation> -->
+					<mapperLocation>WEB-INF/sqlmap/COMMON/*.xml</mapperLocation> 
+				</mobile>
+				
+			</msp>
+		</mybatis>
+	</datasource>
+	
+	<server>
+		<session>
+			<filter></filter>
+			<use>false</use>
+		</session>
+        <!--중요:모바일 통계 정보가 쌓일 물리적인 디렉토리 경로 설정-->
+		<eventlog>
+			<use>true</use>
+			<save_path>/data/logs/ableM/tms/eventlogs/</save_path>
+		</eventlog>
+	</server>
+	<!-- Resource Download URL -->
+	<resource>
+        <!--리소스 zip파일 다운받을 URL을 Request 프로토콜이 http든 https든 상관없이 무조건 https로 URL을 만들어 보냄-->
+        <https_force_yn>N</https_force_yn>
+        <https_port></https_port>
+        <!--매우중요: 리소스 배포할 서버가 따로 존재할경우 해당 리소스배포서버 URL정보를 넣어준다. 만약, 리소스배포파일서버가 따로 없다면 빈값으로 넣어야함(중요)-->
+		<download_url></download_url>
+	</resource>
+	
+	<!-- msp Store Configuration -->
+	<store>
+		<service>
+            <!--중요! 스토어에서 배포한 앱을 다운받을수 웹어드민 URL 주소 이주소는 Admin페이지 주소 + ContextRoot로 하면됨-->
+			<url>http://211.241.199.217:18080/msp-admin/</url>
+		</service>
+		<path>
+			<!-- <img>img</img> -->
+			<bin>apk</bin>
+		</path>
+		<upload>
+            <!--중요:스토어에서 배포할 앱이 저장될 물리적인 디렉토리 경로인데 해당 웹서버의 루트디렉토리로 설정 즉 웹서버 WEB-INF가 있는 부모디렉토리 풀경로적으면됨-->
+			<absolute_path>/home/uracle/msp-server/tomcat6/webapps/msp-admin/</absolute_path> <!-- DEV -->
+			<!-- <absolute_path>D:/logs/ableM/tms/tomcat6/webapps/msp-admin/</absolute_path>   REAL -->
+		</upload>
+	</store>
+    <!--
+    브라우저에서도 동일하게 사용할 수 있도록 하기 위해 해당 리소스가 존재하는 물리적인 디렉토리 설정
+    확인: 아래의 설정한 모바일 리소스가 위치가 웹서버안에 존재 하지 않을시 웹서버 디렉토리에 심볼릭 링크(real_res, dev_res)를 만들어 주세요
+    ====> !중요!!!! 마지막 리소스 폴더명은 res로 만들어 주세요
+    윈도우 : mklink /d <웹서버안에만들심볼릭링크디렉토리풀경로> <실제존재하는디렉토리풀경로>  ==> 구분 스페이스
+            예)mklink /d C:\project\web-proj\m-server-plat\server\msp-gw-web\target\msp-gw-web-2.0.0\real_res F:\temp\webplatform_res\real_res
+            삭제: rmdir 웹서버안에 지울 심볼릭링크디렉토리풀경로
+    리눅스 : ln -s <존재하는디렉토리풀경로> <만들링크디렉토리 풀경로>
+            예)ln -s /home/uracle/msp-server/webflatform_res/res_res/ /home/uracle/msp-server/tomcat6/webapps/msp-gw/real_res
+            삭제: rm <만들링크디렉토리 풀경로>
+    -->
+    <webplatform>
+        <!--중요. 반드시 확인 마지막 /는 없게 해 주세요. 그리고 어드민에서 배포한 폴더명 마지막 real_res, dev_res는 빼야함
+        <resource_path>F:/temp/webplatform_res</resource_path> -->
+        <!-- REAL  -->
+        <resource_path>F:/temp/webplatform_res</resource_path>
+		<webRoot>/msp-gw</webRoot>
+		<webInterfaceRoot>real_res/1/res</webInterfaceRoot>
+		
+    </webplatform>
+    <!-- demo mode configuration. web.xml의 DemoFilter mode 설정을 P(통과),W(쓰기),R(읽기)로 변경했을 때 참조. -->
+	<!-- 해당코드 운영에 없음
+	<demo>
+    	<condition>
+    		<phone_no>*</phone_no>
+    		<appid>*</appid>
+    		<api>/api</api>
+    	</condition>
+    	<cache>
+    		<path>/demo_cache</path>
+    	</cache>
+    </demo>
+    -->
+</configuration>

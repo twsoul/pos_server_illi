@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="able.cmm.msg.service.dao.MessageMngMDAO">
+
+    
+    <select id="selectMessageList" parameterType="hMap" resultType="hMap">
+        SELECT MSG_KEY key, 
+               MSG_TEXT value, 
+               MSG_LANGUAGE language, 
+               MSG_TIMESTAMP lastmodify
+          FROM ABLE_MSG
+    </select>
+    
+    <select id="selectMessageByKey" parameterType="hMap" resultType="hMap">
+        SELECT MSG_KEY key, 
+               MSG_TEXT value, 
+               MSG_LANGUAGE language, 
+               MSG_TIMESTAMP lastmodify
+          FROM ABLE_MSG
+         WHERE MSG_KEY = #{msgKey}
+    </select>
+
+    <delete id="deleteMessageByKey" parameterType="hMap">
+        DELETE FROM ABLE_MSG
+         WHERE MSG_KEY = #{msgKey}
+    </delete>
+    
+    <update id="updateMessage" parameterType="hMap">
+        UPDATE ABLE_MSG
+           SET MSG_TEXT = #{msgText},
+               MSG_TIMESTAMP = TO_CHAR(CURDATE(),'YYYY/MM/DD')+' '+ TO_CHAR(CURTIME(),'HH24:MI:SS')
+         WHERE MSG_KEY = #{msgKey}
+           AND MSG_LANGUAGE = #{msgLanguage}
+    </update>
+    
+    <insert id="insertMessage" parameterType="able.cmm.msg.vo.MessageMngVO">
+        INSERT 
+          INTO ABLE_MSG(
+               MSG_KEY,
+               MSG_TEXT,
+               MSG_LANGUAGE,
+               MSG_TIMESTAMP)
+        VALUES (#{msgKey}, 
+               #{msgText}, 
+               #{msgLanguage}, 
+               TO_CHAR(CURDATE(),'YYYY/MM/DD')+' '+ TO_CHAR(CURTIME(),'HH24:MI:SS'))
+    </insert>
+    
+</mapper>

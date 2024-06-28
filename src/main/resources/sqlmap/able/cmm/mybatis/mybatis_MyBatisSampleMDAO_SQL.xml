@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    SQL File Name : mybatis_MyBatisSampleMDAO_sql.xml 
+    Description : mybatis 데이터를 관리한다.(등록, 수정, 삭제 및 조회)
+
+    Modification Information 
+               수정일                 수정자         Version      Query Id
+    ==========  =======  ========   ==============
+    2016.02.14    전경선            1.0          최초 생성 
+-->
+
+<mapper namespace="able.cmm.mybatis.service.dao.MyBatisSampleMDAO">
+
+    <!-- 
+        Query ID : selectMyBatisList
+        Description : mybatis 테이블의 목록을 조회한다.
+     -->
+    <select id="selectMyBatisList" parameterType="hMap" resultType="hMap">
+    <![CDATA[
+        SELECT /* Query ID=able.cmm.mybatis.service.dao.MyBatisSampleMDAO.selectMyBatisList */
+               ID, NAME, DESCRIPTION, USE_YN, REG_USER
+          FROM SAMPLE
+          LIMIT #{limit} OFFSET #{offset}
+    ]]>          
+    </select>
+    
+    <!-- 
+        Query ID : selectMyBatisListTotCnt
+        Description : mybatis 테이블의 목록조회 총 건수
+     -->    
+    <select id="selectMyBatisListTotCnt" parameterType="hMap" resultType="int">
+    <![CDATA[
+        SELECT /* Query ID=able.cmm.mybatis.service.dao.MyBatisSampleMDAO.selectMyBatisListTotCnt */
+               COUNT(ID) CNT
+          FROM SAMPLE
+    ]]>          
+    </select>
+    
+    <!-- 
+        Query ID : selectMyBatisByKey
+        Description : mybatis 테이블의 목록을 조회한다.
+                      id를 검색조건으로 mybatis 상세 데이터를 조회한다.
+     -->
+    <select id="selectMyBatisByKey" parameterType="hMap" resultType="hMap">
+    <![CDATA[
+        SELECT /* Query ID=able.cmm.mybatis.service.dao.MyBatisSampleMDAO.selectMyBatisByKey */
+               ID, NAME, DESCRIPTION, USE_YN, REG_USER
+          FROM SAMPLE
+         WHERE ID = #{id}
+    ]]>
+    </select>
+
+    <!-- 
+        Query ID : deleteMyBatisByKey
+        Description : mybatis 테이블의 데이터를 삭제한다.
+                     id 검색조건에 해당하는 데이터를 삭제한다.
+     -->
+    <delete id="deleteMyBatisByKey" parameterType="hMap">
+    <![CDATA[
+        DELETE /* Query ID=able.cmm.mybatis.service.dao.MyBatisSampleMDAO.deleteMyBatisByKey */
+          FROM SAMPLE
+         WHERE ID = #{id}
+    ]]>
+    </delete>
+    
+    <!-- 
+        Query ID : updateMyBatis
+        Description : mybatis 테이블의 데이터를 수정한다.
+                     id 검색조건에 해당하는 데이터를 수정한다.
+     -->
+    <update id="updateMyBatis" parameterType="hMap">
+    <![CDATA[
+        UPDATE /* Query ID=able.cmm.mybatis.service.dao.MyBatisSampleMDAO.updateMyBatis */
+               SAMPLE
+           SET NAME = #{name},
+               DESCRIPTION = #{description},
+               USE_YN = #{useYn}
+         WHERE ID = #{id}
+    ]]>     
+    </update>
+    
+    <!-- 
+        Query ID : insertMyBatis
+        Description : mybatis 테이블의 데이터를 한건 등록한다.
+     -->
+    <insert id="insertMyBatis" parameterType="hMap">
+    <![CDATA[
+        INSERT /* Query ID=able.cmm.mybatis.service.dao.MyBatisSampleMDAO.insertMyBatis */
+          INTO SAMPLE(
+               ID,
+               NAME,
+               DESCRIPTION,
+               USE_YN,
+               REG_USER
+               )
+        VALUES (#{id}, 
+               #{name}, 
+               #{description}, 
+               #{useYn},
+               #{regUser})
+    ]]>
+    </insert>
+    
+</mapper>

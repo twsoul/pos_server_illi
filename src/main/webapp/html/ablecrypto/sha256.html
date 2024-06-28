@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SHA256 Test</title>
+</head>
+<body>
+<!-- SHA256 Test 시작 -->
+<script src="/ableWeb/js/jquery/jquery-2.1.4.min.js"></script>
+<script src="/ableWeb/js/ablecrypto/able-sha256.js"></script>
+
+<div id="1"></div>
+<div id="2"></div>
+<div id="3"></div>
+<div id="4"></div>
+<div id="5"></div>
+<div id="6"></div>
+
+<script>
+
+var message = "ableframe";
+
+var salt = "ThisIsSalt";
+
+var encryptedBase64 = "RlJC5jTeln5sthKgUYNWxzQpF67U8oODeO/vb3q8fuU=";
+//salt
+var encWithSalt = "SG1U7VvssZ9fpkLdHszEYDZrHSpbs7MohBsLMD99FXU=";
+// salt + iterations(2)
+var encWithSaltIt2 = "f2LXnxt+bZMSGMnxgLmekkMWV8T8yLbPcIlWfZaJrlU=";
+// salt + iterations(3)
+var encWithSaltIt3 = "DnAK7wkkAZ488io7waKH1WbGyY9fmsn0ybD3evRWnRY=";
+// salt + iterations(4)
+var encWithSaltIt4 = "LGrsX1Z6klaEfxtaK1d+j4TaYdim28makXDFKOlPqPo=";
+// salt + iterations(5)
+var encWithSaltIt5 = "CVIdgcHk4XOvwahEWLi7DySYfBimRWAOnHLqfopViX0=";
+
+$('#1').text("Check Hash (no salt): " + ( AbleCrypto.SHA256.digest(message, salt, 0) == encryptedBase64 ));
+$('#2').text("Check Hash (salt): " + ( AbleCrypto.SHA256.digest(message, salt, 1) == encWithSalt ));
+$('#3').text("Check Hash (salt,iteration2): " + ( AbleCrypto.SHA256.digest(message, salt, 2) == encWithSaltIt2 ));
+$('#4').text("Check Hash (salt,iteration3): " + ( AbleCrypto.SHA256.digest(message, salt, 3) == encWithSaltIt3 ));
+$('#5').text("Check Hash (salt,iteration4): " + ( AbleCrypto.SHA256.digest(message, salt, 4) == encWithSaltIt4 ));
+$('#6').text("Check Hash (salt,iteration5): " + ( AbleCrypto.SHA256.digest(message, salt, 5) == encWithSaltIt5 ));
+</script>
+</body>
+</html>
+
